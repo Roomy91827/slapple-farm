@@ -26,10 +26,11 @@ print("A")
 	
 	local function QueueReexecute()
 		if type(queue_on_teleport) == "function" then
+print("B1")
 			queue_on_teleport([[
 		            if isfile("SlappleFarm.lua") then
 		                loadstring(readfile("SlappleFarm.lua"))()
-print("B")
+print("B2")
 		            end
 		        ]])
 		end
