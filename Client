@@ -1,0 +1,113 @@
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local PlaceId = game.PlaceId
+local JobId = game.JobId
+
+local Lobby = workspace:WaitForChild("Lobby")
+local TeleportPart = Lobby:WaitForChild("Teleport1")
+
+local Arena = workspace:WaitForChild("Arena")
+local Island = Arena:WaitForChild("island5")
+local Slapples = Island:WaitForChild("Slapples")
+
+local RawFile = ""
+local FileName = "SlappleFarm.lua"
+
+
+local function SaveScript()
+		local Source = game:HttpGet(RawFile)
+		writefile(FileName, Source)
+	end
+	
+	local function QueueReexecute()
+		if type(queue_on_teleport) == "function" then
+			queue_on_teleport([[
+		            if isfile("SlappleFarm.lua") then
+		                loadstring(readfile("CommandPrompt.lua"))()
+		            end
+		        ]])
+		end
+	end
+
+local ServerLimit = 100
+
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+
+HumanoidRootPart.CFrame = TeleportPart.CFrame
+
+if not Character:FindFirstChild("entered") then
+    repeat
+        task.wait()
+    until Character:FindFirstChild("entered")
+end
+
+local SlappleGloves = {}
+
+for _, Descendant in ipairs(Slapples:GetDescendants()) do
+    if Descendant.Name == "Glove"
+        and Descendant:FindFirstChildWhichIsA("TouchTransmitter") then
+
+        table.insert(SlappleGloves, Descendant)
+    end
+end
+
+for _, Slapple in ipairs(SlappleGloves) do
+firetouchinterest(HumanoidRootPart, Slapple, 0)
+task.wait(0.1)
+firetouchinterest(HumanoidRootPart, Slapple, 1)
+end
+
+local ServerList = {}
+
+local ServerURL = string.format(
+    "https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=%s",
+    PlaceId,
+    ServerLimit
+)
+
+local Success, Response = pcall(function()
+    return HttpService:JSONDecode(game:HttpGetAsync(ServerURL))
+end)
+
+if not Success then
+    error("Failed to retrieve server list: " .. tostring(Response))
+end
+
+if type(Response) ~= "table" or type(Response.data) ~= "table" then
+    error("Invalid server response")
+end
+
+for _, Server in ipairs(Response.data) do
+    if type(Server) == "table"
+        and type(Server.playing) == "number"
+        and type(Server.maxPlayers) == "number"
+        and type(Server.id) == "string"
+        and Server.playing > 0
+        and Server.playing < Server.maxPlayers
+        and Server.id ~= JobId then
+
+        table.insert(ServerList, Server.id)
+    end
+end
+
+if #ServerList == 0 then
+    error("No available servers found")
+end
+
+local SelectedServer = ServerList[math.random(1, #ServerList)]
+
+TeleportService:TeleportToPlaceInstance(
+    PlaceId,
+    SelectedServer,
+    LocalPlayer
+)
