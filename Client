@@ -21,6 +21,7 @@ local FileName = "SlappleFarm.lua"
 local function SaveScript()
 		local Source = game:HttpGet(RawFile)
 		writefile(FileName, Source)
+print("A")
 	end
 	
 	local function QueueReexecute()
@@ -28,6 +29,7 @@ local function SaveScript()
 			queue_on_teleport([[
 		            if isfile("SlappleFarm.lua") then
 		                loadstring(readfile("SlappleFarm.lua"))()
+print("B")
 		            end
 		        ]])
 		end
