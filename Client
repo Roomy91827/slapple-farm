@@ -14,7 +14,7 @@ local Arena = workspace:WaitForChild("Arena")
 local Island = Arena:WaitForChild("island5")
 local Slapples = Island:WaitForChild("Slapples")
 
-local RawFile = ""
+local RawFile = "https://raw.githubusercontent.com/Roomy91827/slapple-farm/refs/heads/main/Client"
 local FileName = "SlappleFarm.lua"
 
 
@@ -27,7 +27,7 @@ local function SaveScript()
 		if type(queue_on_teleport) == "function" then
 			queue_on_teleport([[
 		            if isfile("SlappleFarm.lua") then
-		                loadstring(readfile("CommandPrompt.lua"))()
+		                loadstring(readfile("SlappleFarm.lua"))()
 		            end
 		        ]])
 		end
