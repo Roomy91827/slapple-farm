@@ -33,6 +33,9 @@ local function SaveScript()
 		end
 	end
 
+SaveScript()
+QueueReexecute()
+
 local ServerLimit = 100
 
 if not game:IsLoaded() then
